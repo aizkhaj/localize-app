@@ -6,6 +6,9 @@ import rateLimit from 'express-rate-limit';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 
+import messageRoutes from './controllers/messagesController';
+import Message from './models/Message';
+
 dotenv.config();
 
 const app = express();
@@ -31,7 +34,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // db connection
-const MONGODB_URI = 'mongodb://admin:password@localhost:27017/localize'; // normally this would be in a .env file
+const MONGODB_URI = 'mongodb://localhost:27017/test'; // normally this would be in a .env file with more security
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error', err));
@@ -40,6 +43,8 @@ mongoose.connect(MONGODB_URI)
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'Welcome to the Localize API' });
 });
+
+app.use('/messages', messageRoutes);
 
 // socket.io connection
 io.on('connection', (socket) => {
