@@ -5,9 +5,8 @@ import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-
-import messageRoutes from './controllers/messagesController';
 import Message from './models/Message';
+import messageRoutes, { handleMessageSocket } from './controllers/messagesController';
 
 dotenv.config();
 
@@ -47,8 +46,22 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/messages', messageRoutes);
 
 // socket.io connection
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
   console.log('New client connected', socket.id);
+  
+  // attempt to retrieve the last 25 messages on initial connection
+  try {
+    const messages = await Message.find().sort({ createdAt: -1 }).limit(25);
+    socket.emit('messages', messages);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      socket.emit('error', { message: 'Error retrieving messages: ' + error.message });
+    } else {
+      socket.emit('error', { message: 'An unknown error occurred' });
+    }
+  }
+
+  handleMessageSocket(io, socket);
 
   socket.on('disconnect', () => {
     console.log('Client disconnected');
