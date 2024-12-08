@@ -3,9 +3,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider, createTheme, CssBaseline, Box, IconButton } from '@mui/material';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-import { ChatProvider } from './context/ChatContext';
-import { ChatView } from './components/ChatView';
-import { ChatInput } from './components/ChatInput';
+import ChatProvider from './context/ChatContext';
+import ChatView from './components/ChatView';
+import ChatInput from './components/ChatInput';
 
 const queryClient = new QueryClient({
   defaultOptions: {
