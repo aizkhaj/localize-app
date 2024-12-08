@@ -30,7 +30,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
             if (!res.ok) {
               throw new Error('Network response was not ok');
             }
-            console.log('fetching messages', res);
+            console.log('fetching messages through REST', res);
             return res.json();
           });
       }
@@ -92,10 +92,16 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
   useEffect(() => {
     socket.on('newMessage', (message: Message) => {
-      queryClient.setQueryData<Message[]>(MESSAGES_QRY_KEY, (oldMessages = []) => [
-        ...oldMessages,
-        message,
-      ]);
+      /* 
+        Ideally you want to check by user id or something unique instead of name here to avoid duplicate sent messages showing up. 
+        We're already optimistically updating the UI so this prevents it.
+      */
+      if (message.name !== name) {
+        queryClient.setQueryData<Message[]>(MESSAGES_QRY_KEY, (oldMessages = []) => [
+          ...oldMessages,
+          message,
+        ]);
+      }
     });
 
     socket.on('error', (error: Error) => {
@@ -106,7 +112,7 @@ const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       socket.off('newMessage');
       socket.off('error');
     };
-  }, [queryClient]);
+  }, [queryClient, name]);
 
   const sendMessage = (message: string) => {
     if (message.trim()) {
