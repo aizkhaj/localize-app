@@ -7,7 +7,7 @@ const router = Router();
 
 export const getMessages = async (req: Request, res: Response) => {
   try {
-    const message = await Message.find().sort({ createdAt: -1 }).limit(25);
+    const message = await Message.find().sort({ createdAt: 1 }).limit(25);
     res.json(message);
   } catch (error: unknown) {
     if (error instanceof Error) {

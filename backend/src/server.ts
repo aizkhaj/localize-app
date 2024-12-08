@@ -51,7 +51,7 @@ io.on('connection', async (socket) => {
   
   // attempt to retrieve the last 25 messages on initial connection
   try {
-    const messages = await Message.find().sort({ createdAt: -1 }).limit(25);
+    const messages = await Message.find().sort({ createdAt: 1 }).limit(25);
     socket.emit('messages', messages);
   } catch (error: unknown) {
     if (error instanceof Error) {
